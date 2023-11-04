@@ -16,7 +16,7 @@ with open("build.ninja", "w+") as f:
         "javac",
         cmd(
             "javac",
-            "-cp",
+            "--class-path",
             src_dir,
             "--module-path",
             src_dir,
