@@ -1,5 +1,6 @@
 import ninja
 import pathlib
+import sys
 
 
 def cmd(*args):
@@ -20,6 +21,8 @@ with open("build.ninja", "w+") as f:
             "--class-path", "$src_dir", "--module-path", "$src_dir", "-d", "$build_dir"
         ),
     )
+    writer.rule("regen_ninja", cmd(sys.executable, __file__))
+    writer.build("build.ninja", "regen_ninja", implicit=[__file__])
     writer.rule("javac", cmd("javac", "$flags", "$in"))
     for src in srcs:
         classfile = src.relative_to(src_dir).with_suffix(".class")
