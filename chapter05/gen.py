@@ -21,5 +21,5 @@ writer.rule("javac", cmd("javac", "$flags", "$in"))
 for src in srcs:
     rel_src = src.relative_to(src_dir)
     javafile = pathlib.Path("$src_dir").joinpath(rel_src)
-    dst = pathlib.Path("$build_dir").joinpath(rel_src.with_suffix(".class"))
+    dst = pathlib.Path("$build_dir").joinpath(rel_src).with_suffix(".class")
     writer.build(str(dst), "javac", str(javafile))
