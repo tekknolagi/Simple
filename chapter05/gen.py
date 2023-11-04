@@ -8,7 +8,7 @@ def cmd(*args):
 
 
 build_dir = pathlib.Path("build")
-src_dir = pathlib.Path("src/main/java")
+src_dir = pathlib.Path("src").joinpath("main").joinpath("java")
 srcs = (path for path in src_dir.rglob("*.java"))
 
 writer = ninja.Writer(sys.stdout)
