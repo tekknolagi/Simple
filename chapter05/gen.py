@@ -12,14 +12,14 @@ src_dir = pathlib.Path("src/main/java")
 srcs = (path for path in src_dir.rglob("*.java"))
 
 writer = ninja.Writer(sys.stdout)
-writer.variable("src_dir", str(src_dir))
-writer.variable("build_dir", str(build_dir))
+writer.variable("src_dir", src_dir)
+writer.variable("build_dir", build_dir)
 writer.variable(
     "flags",
     cmd("--class-path", "$src_dir", "--module-path", "$src_dir", "-d", "$build_dir"),
 )
 writer.rule("regen_ninja", cmd(sys.executable, "$in", ">", "$out"))
-writer.build("build.ninja", "regen_ninja", inputs=[__file__])
+writer.build("build.ninja", "regen_ninja", __file__)
 writer.rule("javac", cmd("javac", "$flags", "$in"))
 for src in srcs:
     classfile = src.relative_to(src_dir).with_suffix(".class")
