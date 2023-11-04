@@ -7,12 +7,11 @@ def cmd(*args):
     return " ".join(str(arg) for arg in args)
 
 
-build_dir = pathlib.Path("build")
 src_dir = pathlib.Path("src").joinpath("main").joinpath("java")
 
 writer = ninja.Writer(sys.stdout)
 writer.variable("src_dir", src_dir)
-writer.variable("build_dir", build_dir)
+writer.variable("build_dir", "build")
 writer.variable("flags", cmd("--class-path", "$src_dir", "-d", "$build_dir"))
 writer.rule("regen_ninja", cmd(sys.executable, "$in", ">", "$out"))
 writer.build("build.ninja", "regen_ninja", __file__)
