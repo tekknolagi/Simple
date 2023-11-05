@@ -16,8 +16,24 @@ writer.variable("flags", cmd("--class-path", "$src_dir", "-d", "$build_dir"))
 writer.rule("regen_ninja", cmd(sys.executable, "$in", ">", "$out"))
 writer.build("build.ninja", "regen_ninja", __file__)
 writer.rule("javac", cmd("javac", "$flags", "$in"))
+writer.rule(
+    "jar",
+    cmd(
+        "jar",
+        "--create",
+        "--file",
+        "$out",
+        "--main-class",
+        "com.seaofnodes.simple.Main",
+        "-C",
+        "$build_dir",
+        ".",
+    ),
+)
+classes = []
 for src in src_dir.rglob("*.java"):
     rel_src = src.relative_to(src_dir)
     javafile = pathlib.Path("$src_dir").joinpath(rel_src)
     dst = pathlib.Path("$build_dir").joinpath(rel_src).with_suffix(".class")
-    writer.build(str(dst), "javac", str(javafile))
+    classes += writer.build(str(dst), "javac", str(javafile))
+writer.build("simple.jar", "jar", classes)
