@@ -24,7 +24,7 @@ writer.rule(
         "--file",
         "$out",
         "--main-class",
-        "com.seaofnodes.simple.Main",
+        "$main_class",
         "-C",
         "$build_dir",
         ".",
@@ -36,4 +36,11 @@ for src in src_dir.rglob("*.java"):
     javafile = pathlib.Path("$src_dir") / rel_src
     dst = pathlib.Path("$build_dir") / rel_src.with_suffix(".class")
     classes += writer.build(str(dst), "javac", str(javafile))
-writer.build("simple.jar", "jar", classes)
+writer.build(
+    "simple.jar",
+    "jar",
+    classes,
+    variables={
+        "main_class": "com.seaofnodes.simple.Main",
+    },
+)
