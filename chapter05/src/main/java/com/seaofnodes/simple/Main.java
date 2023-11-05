@@ -2,7 +2,7 @@ package com.seaofnodes.simple;
 
 import com.seaofnodes.simple.node.*;
 
-class Main {
+public class Main {
   public static void main(String[] args) {
     System.out.println("hi!");
     Parser p = new Parser("int a = 3;");
