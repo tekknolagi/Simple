@@ -22,7 +22,7 @@ use Python.
 """
 
 import re
-import textwrap
+# import textwrap
 
 def escape_path(word):
     return word.replace('$ ', '$$ ').replace(' ', '$ ').replace(':', '$:')
@@ -36,16 +36,17 @@ class Writer(object):
         self.output.write('\n')
 
     def comment(self, text):
-        for line in textwrap.wrap(text, self.width - 2, break_long_words=False,
-                                  break_on_hyphens=False):
-            self.output.write('# ' + line + '\n')
+        self.output.write('# ' + line + '\n')
+        # for line in textwrap.wrap(text, self.width - 2, break_long_words=False,
+        #                           break_on_hyphens=False):
+        #     self.output.write('# ' + line + '\n')
 
     def variable(self, key, value, indent=0):
         if value is None:
             return
         if isinstance(value, list):
             value = ' '.join(filter(None, value))  # Filter out empty strings.
-        self._line('%s = %s' % (key, value), indent)
+        self._line(f'{key} = {value}', indent)
 
     def pool(self, name, depth):
         self._line('pool %s' % name)
@@ -54,7 +55,7 @@ class Writer(object):
     def rule(self, name, command, description=None, depfile=None,
              generator=False, pool=None, restat=False, rspfile=None,
              rspfile_content=None, deps=None):
-        self._line('rule %s' % name)
+        self._line(f'rule {name}')
         self.variable('command', command, indent=1)
         if description:
             self.variable('description', description, indent=1)
@@ -93,8 +94,9 @@ class Writer(object):
             out_outputs.append('|')
             out_outputs.extend(implicit_outputs)
 
-        self._line('build %s: %s' % (' '.join(out_outputs),
-                                     ' '.join([rule] + all_inputs)))
+        joined_outputs = ' '.join(out_outputs)
+        joined_inputs = ' '.join([rule] + all_inputs)
+        self._line(f'build {joined_outputs}: {joined_inputs}')
         if pool is not None:
             self._line('  pool = %s' % pool)
         if dyndep is not None:
@@ -141,8 +143,7 @@ class Writer(object):
             space = available_space
             while True:
                 space = text.rfind(' ', 0, space)
-                if (space < 0 or
-                    self._count_dollars_before_index(text, space) % 2 == 0):
+                if (space < 0 or self._count_dollars_before_index(text, space) % 2 == 0):
                     break
 
             if space < 0:
@@ -150,8 +151,7 @@ class Writer(object):
                 space = available_space - 1
                 while True:
                     space = text.find(' ', space + 1)
-                    if (space < 0 or
-                        self._count_dollars_before_index(text, space) % 2 == 0):
+                    if (space < 0 or self._count_dollars_before_index(text, space) % 2 == 0):
                         break
             if space < 0:
                 # Give up on breaking.
@@ -185,12 +185,14 @@ def escape(string):
     return string.replace('$', '$$')
 
 
-def expand(string, vars, local_vars={}):
+def expand(string, vars, local_vars=None):
     """Expand a string containing $vars as Ninja would.
 
     Note: doesn't handle the full Ninja variable syntax, but it's enough
     to make configure.py's use of it work.
     """
+    if local_vars is None:
+        local_vars = {}
     def exp(m):
         var = m.group(1)
         if var == '$':
